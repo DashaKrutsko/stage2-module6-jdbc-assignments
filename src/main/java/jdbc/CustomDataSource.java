@@ -5,52 +5,56 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 @Getter
 @Setter
-public class CustomDataSource implements DataSource {
-//public class CustomDataSource {
 
-    private final static String driver = "org.postgresql.Driver";
-    private final static String url ="jdbc:postgresql://localhost:5432/myfirstdb";
-    private final static String name = "postgres";
-    private final static String password = "123";
+public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
 
+    private final String driver = "org.postgresql.Driver";
+    private final String url = "jdbc:postgresql://localhost:5432/myfirstdb";
+    private final String name = "postgres";
+    private final String password = "password";
+    Connection connection;
 
-    private CustomDataSource(String driver, String url, String password, String name) {
-        CustomDataSource ds = new CustomDataSource(driver, url,name,password);
-        System.out.println("Connection OK");
-        Connection connection;
+    public static void main(String[] args) {
+        getInstance();
+    }
+
+    public CustomDataSource() {
         try {
-            connection = DriverManager.getConnection(url,name,password);
-            System.out.println("Connection OK");
+            connection = DriverManager.getConnection(url ,name,password);
+            System.out.println("ok");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static CustomDataSource getInstance() {
-        if (instance == null) {
-            instance = new CustomDataSource(driver, url,name,password);
+        if (instance == null){
+            instance = new CustomDataSource();
         }
         return instance;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return null;
+        return connection;
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return null;
+        return connection;
     }
 
     @Override

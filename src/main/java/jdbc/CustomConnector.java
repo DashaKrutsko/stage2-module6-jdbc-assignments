@@ -1,7 +1,5 @@
 package jdbc;
 
-import org.postgresql.Driver;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -28,7 +26,6 @@ public class CustomConnector {
     }
 
     public Connection getConnection(String jdbUrl) {
-
         return  null;
     }
 
