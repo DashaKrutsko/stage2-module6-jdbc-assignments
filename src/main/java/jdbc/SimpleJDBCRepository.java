@@ -24,11 +24,10 @@ public class SimpleJDBCRepository {
     static {
         try {
             connection = CustomDataSource.getInstance().getConnection();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException | ClassNotFoundException | IOException throwables) {
             throwables.printStackTrace();
         }
     }
-
 
     private static PreparedStatement ps = null;
     private static Statement st = null;
@@ -98,7 +97,7 @@ public class SimpleJDBCRepository {
         return user;
     }
 
-    private void deleteUser(Long userId) throws SQLException {
+    public void deleteUser(Long userId) throws SQLException {
         ps = connection.prepareStatement(deleteUser);
         ps.setLong(1, userId);
         ps.executeUpdate();

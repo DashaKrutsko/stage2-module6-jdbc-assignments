@@ -8,21 +8,25 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 @Getter
 @Setter
 public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
-    private final String driver = "org.postgresql.Driver";
-    private final String url = "jdbc:postgresql://localhost:5432/myfirstdb";
-    private final String name = "postgres";
-    private final String password = "password";
+    private static String driver = "org.postgresql.Driver";
+    private static String url = "jdbc:postgresql://localhost:5432/myfirstdb";
+    private static String name = "postgres";
+    private static String password = "password";
 
     private static Connection connection = null;
 
@@ -30,13 +34,25 @@ public class CustomDataSource implements DataSource {
         Class.forName(driver);
         connection = DriverManager.getConnection(url, name, password);
     }
-    private CustomDataSource() throws SQLException, ClassNotFoundException {
-        Class.forName(driver);
+    private CustomDataSource() throws SQLException, ClassNotFoundException, IOException {
+        Properties props = new Properties();
+        FileInputStream in = new FileInputStream("src/main/resources/app.properties");
+        props.load(in);
+        in.close();
+
+        String driver = props.getProperty("postgres.driver");
+        if (driver != null) {
+            Class.forName(driver) ;
+        }
+        url = props.getProperty("postgres.url");
+        name = props.getProperty("postgres.name");
+        password = props.getProperty("postgres.password");
+
         connection = DriverManager.getConnection(url, name, password);
         System.out.println("ok");
     }
 
-    public static CustomDataSource getInstance() throws SQLException, ClassNotFoundException {
+    public static CustomDataSource getInstance() throws SQLException, ClassNotFoundException, IOException {
         if (instance == null) {
             instance = new CustomDataSource();
         }
