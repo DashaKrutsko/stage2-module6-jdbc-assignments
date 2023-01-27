@@ -20,7 +20,16 @@ import java.util.Properties;
 //@NoArgsConstructor
 public class SimpleJDBCRepository {
 
-    private static Connection connection = null;
+    private static Connection connection;
+    static {
+        try {
+            connection = CustomDataSource.getInstance().getConnection();
+        } catch (SQLException | ClassNotFoundException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+
     private static PreparedStatement ps = null;
     private static Statement st = null;
 
@@ -31,16 +40,13 @@ public class SimpleJDBCRepository {
     private static final String findUserByNameSQL = "SELECT * FROM MYUSERS WHERE FIRSTNAME=?";
     private static final String findAllUserSQL = "SELECT * FROM MYUSERS";
 
-    public Long createUser() throws SQLException {
-        User user = new User();
+    public Long createUser(User user) throws SQLException {
         ps = connection.prepareStatement(createUserSQL);
-        ps.setString(1, "Olga");
-        ps.setString(2, "Ivanova");
-        ps.setInt(3, 50);
+        ps.setString(1, user.getFirstName());
+        ps.setString(2, user.getLastName());
+        ps.setInt(3, user.getAge());
         ps.execute();
-        user.setAge(50);
-        user.setFirstName("Olga");
-        user.setLastName("Ivanova");
+
         return null;
     }
 
@@ -82,24 +88,19 @@ public class SimpleJDBCRepository {
 
     }
 
-    public User updateUser() throws SQLException {
+    public User updateUser(User user) throws SQLException {
         ps = connection.prepareStatement(updateUserSQL);
-        ps.setString(1, "Olga2");
-        ps.setString(2, "Ivanova2");
-        ps.setInt(3, 502);
-        ps.setLong(4, 1);
+        ps.setString(1, user.getFirstName());
+        ps.setString(2, user.getLastName());
+        ps.setInt(3, user.getAge());
+        ps.setLong(4, user.getId());
         ps.executeUpdate();
-        User user = new User();
-        user.setId(1L);
-        user.setFirstName("Olga2");
-        user.setLastName("Ivanova2");
-        user.setAge(502);
         return user;
     }
 
     private void deleteUser(Long userId) throws SQLException {
         ps = connection.prepareStatement(deleteUser);
-        ps.setLong(1, 1);
+        ps.setLong(1, userId);
         ps.executeUpdate();
     }
 }

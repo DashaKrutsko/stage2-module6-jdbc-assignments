@@ -1,9 +1,13 @@
 package jdbc;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,31 +17,27 @@ import java.util.logging.Logger;
 
 @Getter
 @Setter
-
 public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
-
     private final String driver = "org.postgresql.Driver";
     private final String url = "jdbc:postgresql://localhost:5432/myfirstdb";
     private final String name = "postgres";
     private final String password = "password";
-    Connection connection;
 
-    public static void main(String[] args) {
-        getInstance();
+    private static Connection connection = null;
+
+    private CustomDataSource(String driver, String url, String password, String name) throws SQLException, ClassNotFoundException {
+        Class.forName(driver);
+        connection = DriverManager.getConnection(url, name, password);
+    }
+    private CustomDataSource() throws SQLException, ClassNotFoundException {
+        Class.forName(driver);
+        connection = DriverManager.getConnection(url, name, password);
+        System.out.println("ok");
     }
 
-    public CustomDataSource() {
-        try {
-            connection = DriverManager.getConnection(url ,name,password);
-            System.out.println("ok");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static CustomDataSource getInstance() {
-        if (instance == null){
+    public static CustomDataSource getInstance() throws SQLException, ClassNotFoundException {
+        if (instance == null) {
             instance = new CustomDataSource();
         }
         return instance;
@@ -50,7 +50,7 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return connection;
+        return null;
     }
 
     @Override
