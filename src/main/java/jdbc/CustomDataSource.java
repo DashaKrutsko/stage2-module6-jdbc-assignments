@@ -1,19 +1,10 @@
 package jdbc;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
-
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
@@ -23,45 +14,42 @@ import java.util.logging.Logger;
 @Setter
 public class CustomDataSource implements DataSource {
     private static volatile CustomDataSource instance;
-    private static String driver = "org.postgresql.Driver";
-    private static String url = "jdbc:postgresql://localhost:5432/myfirstdb";
-    private static String name = "postgres";
-    private static String password = "password";
+    private final String driver;
+    private final String url;
+    private final String name;
+    private final String password;
 
-    private static Connection connection = null;
-
-    private CustomDataSource(String driver, String url, String password, String name) throws SQLException, ClassNotFoundException {
-        Class.forName(driver);
-        connection = DriverManager.getConnection(url, name, password);
-    }
-    private CustomDataSource() throws SQLException, ClassNotFoundException, IOException {
-        Properties props = new Properties();
-        FileInputStream in = new FileInputStream("src/main/resources/app.properties");
-        props.load(in);
-        in.close();
-
-        String driver = props.getProperty("postgres.driver");
-        if (driver != null) {
-            Class.forName(driver) ;
-        }
-        url = props.getProperty("postgres.url");
-        name = props.getProperty("postgres.name");
-        password = props.getProperty("postgres.password");
-
-        connection = DriverManager.getConnection(url, name, password);
-        System.out.println("ok");
+    private CustomDataSource(String driver, String url, String password, String name) {
+        this.driver = driver;
+        this.url = url;
+        this.password = password;
+        this.name = name;
     }
 
-    public static CustomDataSource getInstance() throws SQLException, ClassNotFoundException, IOException {
-        if (instance == null) {
-            instance = new CustomDataSource();
+    public static CustomDataSource getInstance() {
+        if (instance == null){
+                if (instance == null){
+                    try{
+                        Properties properties = new Properties();
+                        properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
+                        instance = new CustomDataSource(
+                                properties.getProperty("postgres.driver"),
+                                properties.getProperty("postgres.url"),
+                                properties.getProperty("postgres.password"),
+                                properties.getProperty("postgres.name")
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
         }
         return instance;
     }
 
+
     @Override
     public Connection getConnection() throws SQLException {
-        return connection;
+        return null;
     }
 
     @Override

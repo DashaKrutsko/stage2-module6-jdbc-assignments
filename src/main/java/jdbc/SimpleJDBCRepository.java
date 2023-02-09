@@ -1,6 +1,5 @@
 package jdbc;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class SimpleJDBCRepository {
     static {
         try {
             connection = CustomDataSource.getInstance().getConnection();
-        } catch (SQLException | ClassNotFoundException | IOException throwables) {
+        } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -40,13 +39,18 @@ public class SimpleJDBCRepository {
     private static final String findAllUserSQL = "SELECT * FROM MYUSERS";
 
     public Long createUser(User user) throws SQLException {
+        long id = 0;
         ps = connection.prepareStatement(createUserSQL);
         ps.setString(1, user.getFirstName());
         ps.setString(2, user.getLastName());
         ps.setInt(3, user.getAge());
         ps.execute();
 
-        return null;
+        ResultSet resultSet = ps.getGeneratedKeys();
+        if (resultSet != null){
+            id = resultSet.getLong(1);
+        }
+        return id;
     }
 
     public User findUserById(Long userId) throws SQLException {
@@ -84,7 +88,6 @@ public class SimpleJDBCRepository {
             list.add(user);
         }
         return list;
-
     }
 
     public User updateUser(User user) throws SQLException {
