@@ -29,7 +29,7 @@ public class SimpleJDBCRepository {
     private static final String findAllUserSQL = "SELECT * FROM MYUSERS";
 
 
-    public Long createUser(User user) throws SQLException {
+    public Long createUser(User user) {
         long id = 0;
         connection = CustomDataSource.getInstance().getConnection();
         ps = connection.prepareStatement(createUserSQL);
@@ -45,7 +45,7 @@ public class SimpleJDBCRepository {
         return id;
     }
 
-    public User findUserById(Long userId) throws SQLException {
+    public User findUserById(Long userId) {
         connection = CustomDataSource.getInstance().getConnection();
         ps = connection.prepareStatement(findUserByIdSQL);
         ps.setLong(1, 1);
@@ -59,7 +59,7 @@ public class SimpleJDBCRepository {
         return user;
     }
 
-    public User findUserByName(String userName) throws SQLException {
+    public User findUserByName(String userName) {
         connection = CustomDataSource.getInstance().getConnection();
         ps = connection.prepareStatement(findUserByNameSQL);
         ps.setString(1, "dasha");
@@ -73,7 +73,7 @@ public class SimpleJDBCRepository {
         return user;
     }
 
-    public List<User> findAllUser() throws SQLException {
+    public List<User> findAllUser() {
         List<User> list = new ArrayList<>();
         connection = CustomDataSource.getInstance().getConnection();
         st = connection.createStatement();
@@ -85,7 +85,7 @@ public class SimpleJDBCRepository {
         return list;
     }
 
-    public User updateUser(User user) throws SQLException {
+    public User updateUser(User user) {
         connection = CustomDataSource.getInstance().getConnection();
         ps = connection.prepareStatement(updateUserSQL);
         ps.setString(1, user.getFirstName());
@@ -96,7 +96,7 @@ public class SimpleJDBCRepository {
         return user;
     }
 
-    public void deleteUser(Long userId) throws SQLException {
+    public void deleteUser(Long userId){
         connection = CustomDataSource.getInstance().getConnection();
         ps = connection.prepareStatement(deleteUser);
         ps.setLong(1, userId);
