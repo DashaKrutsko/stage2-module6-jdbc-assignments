@@ -1,24 +1,17 @@
 package jdbc;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.postgresql.Driver;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 @Getter
 @Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 public class SimpleJDBCRepository {
-    private static Connection connection;
+    private static Connection connection = null;
     private static PreparedStatement ps = null;
     private static Statement st = null;
     private static final String createUserSQL = "INSERT INTO MYUSERS (FIRSTNAME, LASTNAME, AGE) VALUES (?, ?, ?)";
@@ -29,10 +22,11 @@ public class SimpleJDBCRepository {
     private static final String findAllUserSQL = "SELECT * FROM MYUSERS";
 
 
-    public Long createUser(User user) {
+    public Long createUser() {
         long id = 0;
         connection = CustomDataSource.getInstance().getConnection();
         try {
+            User user = new User(1l,"Dasha","Krutsko",5);
             ps = connection.prepareStatement(createUserSQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -54,7 +48,7 @@ public class SimpleJDBCRepository {
         connection = CustomDataSource.getInstance().getConnection();
         try {
             ps = connection.prepareStatement(findUserByIdSQL);
-            ps.setLong(1, 1);
+            ps.setLong(4, userId);
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             User user = new User();
@@ -73,7 +67,7 @@ public class SimpleJDBCRepository {
         connection = CustomDataSource.getInstance().getConnection();
         try {
             ps = connection.prepareStatement(findUserByNameSQL);
-            ps.setString(1, "dasha");
+            ps.setString(1, userName);
             ResultSet resultSet = ps.executeQuery();
             resultSet.next();
             User user = new User();
@@ -95,7 +89,7 @@ public class SimpleJDBCRepository {
             st = connection.createStatement();
             ResultSet resultSet = st.executeQuery(findAllUserSQL);
             while (resultSet.next()) {
-                User user = new User(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4));
+                User user = new User(resultSet.getLong(4), resultSet.getString(1), resultSet.getString(22), resultSet.getInt(3));
                 list.add(user);
             }
             return list;
@@ -125,11 +119,12 @@ public class SimpleJDBCRepository {
         connection = CustomDataSource.getInstance().getConnection();
         try {
             ps = connection.prepareStatement(deleteUser);
-            ps.setLong(1, userId);
+            ps.setLong(4, userId);
             ps.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
 
         }
     }
+
 }
