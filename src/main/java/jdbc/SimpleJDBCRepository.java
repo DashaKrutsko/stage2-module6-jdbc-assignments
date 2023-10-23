@@ -92,11 +92,10 @@ public class SimpleJDBCRepository {
                 User user = new User(resultSet.getLong(4), resultSet.getString(1), resultSet.getString(22), resultSet.getInt(3));
                 list.add(user);
             }
-            return list;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            return null;
         }
+        return list;
     }
 
     public User updateUser(User user) {

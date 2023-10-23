@@ -61,12 +61,12 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public void setLogWriter(PrintWriter out) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setLoginTimeout(int seconds) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
