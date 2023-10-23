@@ -24,7 +24,6 @@ public class CustomDataSource implements DataSource {
         this.name = name;
     }
 
-
     public static CustomDataSource getInstance() {
         if (instance == null) {
             try {
@@ -42,7 +41,6 @@ public class CustomDataSource implements DataSource {
         }
         return instance;
     }
-
 
     @Override
     public Connection getConnection() {

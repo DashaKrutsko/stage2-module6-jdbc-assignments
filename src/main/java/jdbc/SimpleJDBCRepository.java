@@ -3,9 +3,11 @@ package jdbc;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,23 +22,16 @@ public class SimpleJDBCRepository {
     private static final String FIND_USER_BY_NAME = "SELECT * FROM MYUSERS WHERE FIRSTNAME=?";
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM MYUSERS";
 
-
     public Long createUser(User user) {
-        long id = 0;
-        try  {
+        try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(CREATE_USER);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             ps.execute();
-            ResultSet resultSet = ps.getGeneratedKeys();
-            if (resultSet != null) {
-                id = resultSet.getLong("id");
-                resultSet.close();
-           }
             connection.close();
-            return id;
+            return user.getId();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             return null;
@@ -56,7 +51,6 @@ public class SimpleJDBCRepository {
             user.setFirstName(resultSet.getString("firstname"));
             user.setLastName(resultSet.getString("lastname"));
             user.setAge(resultSet.getInt("age"));
-
             resultSet.close();
             connection.close();
             return user;
@@ -90,7 +84,6 @@ public class SimpleJDBCRepository {
 
     public List<User> findAllUser() {
         List<User> list = new ArrayList<>();
-
         try {
             connection = CustomDataSource.getInstance().getConnection();
             st = connection.createStatement();
@@ -134,7 +127,6 @@ public class SimpleJDBCRepository {
             connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-
         }
     }
 
