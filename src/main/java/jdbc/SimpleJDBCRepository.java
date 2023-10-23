@@ -22,11 +22,10 @@ public class SimpleJDBCRepository {
     private static final String findAllUserSQL = "SELECT * FROM MYUSERS";
 
 
-    public Long createUser() {
+    public Long createUser(User user) {
         long id = 0;
         connection = CustomDataSource.getInstance().getConnection();
         try {
-            User user = new User(1l,"Dasha","Krutsko",5);
             ps = connection.prepareStatement(createUserSQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -41,7 +40,6 @@ public class SimpleJDBCRepository {
             throwables.printStackTrace();
             return null;
         }
-
     }
 
     public User findUserById(Long userId) {
