@@ -15,7 +15,7 @@ public class SimpleJDBCRepository {
     private Connection connection = null;
     private PreparedStatement ps = null;
     private Statement st = null;
-    private static final String CREATE_USER = "INSERT INTO MYUSERS (FIRSTNAME, LASTNAME, AGE, ID) VALUES (?,?, ?, ?)";
+    private static final String CREATE_USER = "INSERT INTO MYUSERS (FIRSTNAME, LASTNAME, AGE) VALUES (?,?,?)";
     private static final String UPDATE_USER = "UPDATE MYUSERS SET FIRSTNAME=?, LASTNAME=?, AGE=? WHERE ID=?";
     private static final String DELETE_USER = "DELETE FROM MYUSERS WHERE ID=?";
     private static final String FIND_USER_BY_ID = "SELECT * FROM MYUSERS WHERE ID=?";
@@ -23,24 +23,27 @@ public class SimpleJDBCRepository {
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM MYUSERS";
 
     public Long createUser(User user) {
+        Long id = null;
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(CREATE_USER);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
-            ps.setLong(4, user.getId());
-            ps.execute();
+            ps.executeUpdate();
+            try (ResultSet resultSet = ps.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    id = resultSet.getLong(1);
+                }
+            }
             connection.close();
-            return user.getId();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            return null;
         }
+        return id;
     }
 
     public User findUserById(Long userId) {
-
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(FIND_USER_BY_ID);
