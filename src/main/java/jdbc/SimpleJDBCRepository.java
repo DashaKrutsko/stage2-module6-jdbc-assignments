@@ -10,9 +10,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class SimpleJDBCRepository {
-    private static Connection connection = null;
-    private static PreparedStatement ps = null;
-    private static Statement st = null;
+    private Connection connection = null;
+    private PreparedStatement ps = null;
+    private Statement st = null;
     private static final String CREATE_USER = "INSERT INTO MYUSERS (FIRSTNAME, LASTNAME, AGE) VALUES (?, ?, ?)";
     private static final String UPDATE_USER = "UPDATE MYUSERS SET FIRSTNAME=?, LASTNAME=?, AGE=? WHERE ID=?";
     private static final String DELETE_USER = "DELETE FROM MYUSERS WHERE ID=?";
@@ -23,8 +23,7 @@ public class SimpleJDBCRepository {
 
     public Long createUser(User user) {
         long id = 0;
-
-        try {
+        try  {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(CREATE_USER);
             ps.setString(1, user.getFirstName());
@@ -33,8 +32,10 @@ public class SimpleJDBCRepository {
             ps.execute();
             ResultSet resultSet = ps.getGeneratedKeys();
             if (resultSet != null) {
-                id = resultSet.getLong(1);
-            }
+                id = resultSet.getLong("id");
+                resultSet.close();
+           }
+            connection.close();
             return id;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -55,6 +56,9 @@ public class SimpleJDBCRepository {
             user.setFirstName(resultSet.getString("firstname"));
             user.setLastName(resultSet.getString("lastname"));
             user.setAge(resultSet.getInt("age"));
+
+            resultSet.close();
+            connection.close();
             return user;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -75,6 +79,8 @@ public class SimpleJDBCRepository {
             user.setFirstName(resultSet.getString("firstname"));
             user.setLastName(resultSet.getString("lastname"));
             user.setAge(resultSet.getInt("age"));
+            resultSet.close();
+            connection.close();
             return user;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -90,9 +96,11 @@ public class SimpleJDBCRepository {
             st = connection.createStatement();
             ResultSet resultSet = st.executeQuery(FIND_ALL_USER_SQL);
             while (resultSet.next()) {
-                User user = new User(resultSet.getLong(4), resultSet.getString(1), resultSet.getString(22), resultSet.getInt(3));
+                User user = new User(resultSet.getLong("id"), resultSet.getString("firstname"), resultSet.getString("lastname"), resultSet.getInt("age"));
                 list.add(user);
             }
+            resultSet.close();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -109,6 +117,7 @@ public class SimpleJDBCRepository {
             ps.setInt(3, user.getAge());
             ps.setLong(4, user.getId());
             ps.executeUpdate();
+            connection.close();
             return user;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -117,12 +126,12 @@ public class SimpleJDBCRepository {
     }
 
     public void deleteUser(Long userId) {
-
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(DELETE_USER);
             ps.setLong(1, userId);
             ps.executeUpdate();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
 
