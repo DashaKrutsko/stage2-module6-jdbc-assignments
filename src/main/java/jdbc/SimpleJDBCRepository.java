@@ -6,9 +6,6 @@ import lombok.Setter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static jdbc.CustomDataSource.*;
-
 @Getter
 @Setter
 @NoArgsConstructor
