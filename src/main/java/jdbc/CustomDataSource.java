@@ -24,25 +24,26 @@ public class CustomDataSource implements DataSource {
         this.url = url;
         this.password = password;
         this.name = name;
+
     }
 
     public static CustomDataSource getInstance() {
-        if (instance == null){
-                if (instance == null){
-                    try{
-                        Properties properties = new Properties();
-                        properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
-                        instance = new CustomDataSource(
-                                properties.getProperty("postgres.driver"),
-                                properties.getProperty("postgres.url"),
-                                properties.getProperty("postgres.password"),
-                                properties.getProperty("postgres.name")
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+
+        if (instance == null) {
+            try {
+                Properties properties = new Properties();
+                properties.load(CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties"));
+                instance = new CustomDataSource(
+                        properties.getProperty("postgres.driver"),
+                        properties.getProperty("postgres.url"),
+                        properties.getProperty("postgres.password"),
+                        properties.getProperty("postgres.name")
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
         return instance;
     }
 
