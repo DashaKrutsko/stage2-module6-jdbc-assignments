@@ -30,7 +30,7 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             ps.executeUpdate();
-            try (ResultSet resultSet = ps.getGeneratedKeys()) {
+            try (ResultSet resultSet = ps.getResultSet()) {
                 if (resultSet.next()) {
                     id = resultSet.getLong(1);
                     user.setId(id);
