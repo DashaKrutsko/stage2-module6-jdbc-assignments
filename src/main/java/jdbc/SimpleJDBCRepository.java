@@ -3,7 +3,6 @@ package jdbc;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +33,7 @@ public class SimpleJDBCRepository {
             try (ResultSet resultSet = ps.getGeneratedKeys()) {
                 if (resultSet.next()) {
                     id = resultSet.getLong(1);
+                    user.setId(id);
                 }
             }
             connection.close();
@@ -105,7 +105,6 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-
         try {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(UPDATE_USER);
